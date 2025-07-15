@@ -6,6 +6,25 @@ import {
 import { notFound } from "next/navigation";
 import { CustomMDX } from "@/components/markdown/renderer";
 
+export async function generateMetadata({
+  params,
+}: {
+  params: Promise<{ slug?: string[] }>;
+}) {
+  const slug = (await params).slug;
+  const articleSlug = slug ? slug.join("/") : "index";
+  
+  const canonicalUrl = articleSlug === "index" 
+    ? "https://xmcp.dev/docs"
+    : `https://xmcp.dev/docs/${articleSlug}`;
+
+  return {
+    alternates: {
+      canonical: canonicalUrl,
+    },
+  };
+}
+
 export default async function Page({
   params,
 }: {
