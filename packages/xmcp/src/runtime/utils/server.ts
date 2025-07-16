@@ -1,10 +1,11 @@
-import { McpServer } from "@modelcontextprotocol/sdk/server/mcp";
+import { McpServer, ToolCallback } from "@modelcontextprotocol/sdk/server/mcp";
 import { Implementation } from "@modelcontextprotocol/sdk/types";
+import { addToolsToServer } from "./tools";
 
 export type ToolFile = {
-  metadata: any;
-  schema: any;
-  default: (...args: any[]) => Promise<any>;
+  metadata: unknown;
+  schema: unknown;
+  default: ToolCallback;
 };
 
 // @ts-expect-error: injected by compiler
@@ -29,20 +30,9 @@ export async function configureServer(
   server: McpServer,
   toolModules: Map<string, ToolFile>
 ): Promise<McpServer> {
-  return new Promise<McpServer>(async (resolve) => {
-    toolModules.forEach((toolModule) => {
-      const { default: handler, metadata, schema } = toolModule;
-      server.tool(
-        metadata.name,
-        metadata.description,
-        schema,
-        metadata.annotations,
-        handler
-      );
-    });
-
-    resolve(server);
-  });
+  addToolsToServer(server, toolModules);
+  // TODO: implement addResourcesToServer, addPromptsToServer
+  return server;
 }
 
 export function loadTools() {
@@ -50,7 +40,6 @@ export function loadTools() {
 
   const toolPromises = Object.keys(injectedTools).map((path) =>
     injectedTools[path]().then((toolModule) => {
-      // TODO add module validation
       toolModules.set(path, toolModule);
     })
   );
