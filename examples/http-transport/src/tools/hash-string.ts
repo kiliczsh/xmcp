@@ -1,5 +1,5 @@
 import { z } from "zod";
-import { type InferSchema } from "xmcp";
+import { type ToolMetadata, type InferSchema } from "xmcp";
 
 export const schema = {
   input: z
@@ -8,8 +8,9 @@ export const schema = {
     .describe("The string to hash"),
 };
 
-export const metadata = {
+export const metadata: ToolMetadata = {
   name: "hash-string",
+  description: "Hash a string using SHA-256",
 };
 
 export default async function hashString({
