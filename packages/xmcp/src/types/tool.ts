@@ -22,3 +22,12 @@ export interface Tool {
   metadata: ToolMetadata;
   schema: Record<string, z.ZodType>;
 }
+
+export type ToolSchema = Record<
+  string,
+  z.ZodType<unknown, z.ZodTypeDef, unknown>
+>;
+
+export type InferSchema<T extends ToolSchema> = {
+  [K in keyof T]: z.infer<T[K]>;
+};
