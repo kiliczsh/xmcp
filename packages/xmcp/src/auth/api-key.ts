@@ -77,8 +77,8 @@ export function apiKeyAuthMiddleware(
   config: StaticApiKeyConfig | CustomValidationConfig
 ): RequestHandler {
   // To do, we can maybe work on better error handling here, like typing the error messages etc
-  const { success, error } = apiKeyAuthMiddlewareConfigSchema.safeParse(config);
-  if (!success) {
+  const response = apiKeyAuthMiddlewareConfigSchema.safeParse(config);
+  if (!response.success) {
     const hasApiKey = "apiKey" in config;
     const hasValidateApiKey = "validateApiKey" in config;
 
@@ -89,7 +89,7 @@ export function apiKeyAuthMiddleware(
     } else if (!hasApiKey && !hasValidateApiKey) {
       throw new Error("Either 'apiKey' or 'validateApiKey' must be provided");
     } else {
-      throw new Error(`Invalid configuration: ${error.message}`);
+      throw new Error(`Invalid configuration: ${response.error.message}`);
     }
   }
 
