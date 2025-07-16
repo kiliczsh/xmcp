@@ -1,5 +1,5 @@
 import { z } from "zod";
-import { type ToolMetadata, type InferSchema } from "xmcp";
+import { type InferSchema, type ToolMetadata } from "xmcp";
 
 // Define the schema for tool parameters
 export const schema = {
