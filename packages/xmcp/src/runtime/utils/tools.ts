@@ -35,10 +35,9 @@ export function addToolsToServer(
   toolModules.forEach((toolModule, path) => {
     const defaultName = pathToName(path);
 
-    const toolConfig: Required<ToolMetadata> = {
+    const toolConfig: ToolMetadata = {
       name: defaultName,
       description: "No description provided",
-      annotations: {},
     };
     let toolSchema: ZodRawShape = {};
 
@@ -55,6 +54,14 @@ export function addToolsToServer(
       console.warn(
         `Invalid schema for tool "${toolConfig.name}" at ${path}. Expected Record<string, z.ZodType>`
       );
+    }
+
+    // Make sure tools has annotations with a title
+    if (toolConfig.annotations === undefined) {
+      toolConfig.annotations = {};
+    }
+    if (toolConfig.annotations.title === undefined) {
+      toolConfig.annotations.title = toolConfig.name;
     }
 
     server.tool(
