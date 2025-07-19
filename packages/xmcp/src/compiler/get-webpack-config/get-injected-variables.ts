@@ -4,6 +4,7 @@ import { XmcpParsedConfig } from "@/compiler/parse-xmcp-config";
 import { compilerContext } from "../compiler-context";
 import {
   injectCorsVariables,
+  InjectedVariables,
   injectHttpVariables,
   injectOAuthVariables,
   injectPathsVariables,
@@ -15,7 +16,9 @@ import {
  * This utility will define those variables based on the user's config.
  */
 
-export function getInjectedVariables(xmcpConfig: XmcpParsedConfig) {
+export function getInjectedVariables(
+  xmcpConfig: XmcpParsedConfig
+): InjectedVariables {
   const { mode } = compilerContext.getContext();
 
   const httpVariables = injectHttpVariables(xmcpConfig.http, mode);

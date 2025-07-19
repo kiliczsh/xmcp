@@ -24,6 +24,8 @@ export function injectHttpVariables(
   };
 }
 
+export type HttpVariables = ReturnType<typeof injectHttpVariables>;
+
 export function injectCorsVariables(httpConfig: HttpTransportConfig | null) {
   const corsConfig = getResolvedCorsConfig(httpConfig);
 
@@ -37,6 +39,8 @@ export function injectCorsVariables(httpConfig: HttpTransportConfig | null) {
   };
 }
 
+export type CorsVariables = ReturnType<typeof injectCorsVariables>;
+
 export function injectOAuthVariables(userConfig: any) {
   const oauthConfig = getResolvedOAuthConfig(userConfig);
 
@@ -45,6 +49,8 @@ export function injectOAuthVariables(userConfig: any) {
   };
 }
 
+export type OAuthVariables = ReturnType<typeof injectOAuthVariables>;
+
 export function injectPathsVariables(userConfig: any) {
   const pathsConfig = getResolvedPathsConfig(userConfig);
 
@@ -52,3 +58,11 @@ export function injectPathsVariables(userConfig: any) {
     TOOLS_PATH: JSON.stringify(pathsConfig.tools),
   };
 }
+
+export type PathsVariables = ReturnType<typeof injectPathsVariables>;
+
+export type InjectedVariables =
+  | HttpVariables
+  | CorsVariables
+  | OAuthVariables
+  | PathsVariables;
