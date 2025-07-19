@@ -4,7 +4,7 @@ import { webpack, type Configuration } from "webpack";
 import { createFsFromVolume, Volume } from "memfs";
 import { compilerContext } from "./compiler-context";
 import { configSchema, type InputSchema, type OutputSchema } from "./config";
-import { DEFAULT_TOOLS_DIR } from "./config/constants";
+import { DEFAULT_PATHS_CONFIG } from "./config/constants";
 
 /** Config type for the user to provide */
 export type XmcpInputConfig = Omit<InputSchema, "webpack"> & {
@@ -71,9 +71,7 @@ export async function readConfig(): Promise<XmcpParsedConfig> {
   return {
     stdio: true,
     http: true,
-    paths: {
-      tools: DEFAULT_TOOLS_DIR,
-    },
+    paths: DEFAULT_PATHS_CONFIG,
   } satisfies XmcpInputConfig;
 }
 

@@ -1,30 +1,11 @@
-import {
-  CorsConfig,
-  OauthConfig,
-  AdapterConfig,
-  ExperimentalConfig,
-  PathsConfig,
-} from ".";
-
-/**
- * Default values for the HTTP server
- */
-
-export const DEFAULT_HTTP_PORT = 3002;
-export const DEFAULT_HTTP_HOST = "127.0.0.1";
-export const DEFAULT_HTTP_BODY_SIZE_LIMIT = 1024 * 1024 * 10; // 10MB
-export const DEFAULT_HTTP_ENDPOINT = "/mcp";
-export const DEFAULT_HTTP_STATELESS = true;
-
-/**
- * Default values for the tools directory
- */
-export const DEFAULT_TOOLS_DIR = "src/tools";
+// ------------------------------------------------------------
+// Constants
+// ------------------------------------------------------------
 
 /**
  * Default values for CORS config
  */
-export const DEFAULT_CORS_CONFIG: CorsConfig = {
+export const DEFAULT_CORS_CONFIG = {
   origin: "*",
   methods: ["GET", "POST"],
   allowedHeaders: [
@@ -34,24 +15,25 @@ export const DEFAULT_CORS_CONFIG: CorsConfig = {
     "mcp-protocol-version",
   ],
   exposedHeaders: ["Content-Type", "Authorization", "mcp-session-id"],
-  credentials: true,
-  maxAge: 600,
+  credentials: false,
+  maxAge: 86400,
 };
 
 /**
- * Default values for Oauth config
+ * Default values for the HTTP transport
  */
-export const DEFAULT_OAUTH_CONFIG: OauthConfig = {
-  endpoints: {
-    authorizationUrl: "https://example.com/oauth2/authorize",
-    tokenUrl: "https://example.com/oauth2/token",
-    registerUrl: "https://example.com/oauth2/register",
-  },
-  issuerUrl: "https://example.com",
-  baseUrl: "https://example.com",
-  serviceDocumentationUrl: "https://example.com/oauth2/service-documentation",
-  pathPrefix: "/oauth2",
-  defaultScopes: ["openid", "profile", "email"],
+export const DEFAULT_HTTP_CONFIG = {
+  port: 3002,
+  host: "127.0.0.1",
+  bodySizeLimit: 1024 * 1024 * 10, // 10MB
+  debug: false,
+  endpoint: "/mcp",
+  cors: DEFAULT_CORS_CONFIG,
 };
 
-/** */
+/**
+ * Default values for the tools directory
+ */
+export const DEFAULT_PATHS_CONFIG = {
+  tools: "src/tools",
+};
