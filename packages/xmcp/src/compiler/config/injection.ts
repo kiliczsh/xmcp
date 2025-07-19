@@ -6,7 +6,6 @@ import {
 } from "./utils";
 import { HttpTransportConfig } from "./schemas/transport/http";
 
-// perhaps type the variables?
 export function injectHttpVariables(
   httpConfig: HttpTransportConfig | boolean,
   mode: string
@@ -15,12 +14,14 @@ export function injectHttpVariables(
   if (!resolvedConfig) return {};
 
   return {
-    HTTP_PORT: resolvedConfig.port,
-    HTTP_HOST: resolvedConfig.host,
-    HTTP_BODY_SIZE_LIMIT: JSON.stringify(resolvedConfig.bodySizeLimit),
-    HTTP_ENDPOINT: JSON.stringify(resolvedConfig.endpoint),
-    HTTP_STATELESS: true, // eventually should be configurable for statfeul
-    HTTP_DEBUG: mode === "development",
+    HTTP_CONFIG: JSON.stringify({
+      port: resolvedConfig.port,
+      host: resolvedConfig.host,
+      bodySizeLimit: resolvedConfig.bodySizeLimit,
+      endpoint: resolvedConfig.endpoint,
+      stateless: true,
+      debug: mode === "development",
+    }),
   };
 }
 
@@ -30,12 +31,14 @@ export function injectCorsVariables(httpConfig: HttpTransportConfig | null) {
   const corsConfig = getResolvedCorsConfig(httpConfig);
 
   return {
-    HTTP_CORS_ORIGIN: JSON.stringify(corsConfig.origin ?? ""),
-    HTTP_CORS_METHODS: JSON.stringify(corsConfig.methods ?? ""),
-    HTTP_CORS_ALLOWED_HEADERS: JSON.stringify(corsConfig.allowedHeaders ?? ""),
-    HTTP_CORS_EXPOSED_HEADERS: JSON.stringify(corsConfig.exposedHeaders ?? ""),
-    HTTP_CORS_CREDENTIALS: corsConfig.credentials ?? false,
-    HTTP_CORS_MAX_AGE: corsConfig.maxAge ?? 0,
+    HTTP_CORS_CONFIG: JSON.stringify({
+      origin: corsConfig.origin ?? "",
+      methods: corsConfig.methods ?? "",
+      allowedHeaders: corsConfig.allowedHeaders ?? "",
+      exposedHeaders: corsConfig.exposedHeaders ?? "",
+      credentials: corsConfig.credentials ?? false,
+      maxAge: corsConfig.maxAge ?? 0,
+    }),
   };
 }
 
