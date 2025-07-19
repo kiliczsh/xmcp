@@ -1,10 +1,10 @@
-import { xmcpHandler } from "@xmcp/adapter";
+import { xmcpHandler, withAuth, VerifyToken } from "@xmcp/adapter";
 
 /**
  * Verify the bearer token and return auth information
  * In a real implementation, this would validate against your auth service
  */
-const verifyToken = async (req: Request, bearerToken?: string) => {
+const verifyToken: VerifyToken = async (req: Request, bearerToken?: string) => {
   if (!bearerToken) return undefined;
 
   // TODO: Replace with actual token verification logic
@@ -32,15 +32,9 @@ const options = {
   resourceMetadataPath: "/.well-known/oauth-protected-resource",
 };
 
-const auth = {
+const handler = withAuth(xmcpHandler, {
   verifyToken,
   options,
-};
+});
 
-export async function GET(request: Request) {
-  return xmcpHandler(request, auth);
-}
-
-export async function POST(request: Request) {
-  return xmcpHandler(request, auth);
-}
+export { handler as GET, handler as POST };

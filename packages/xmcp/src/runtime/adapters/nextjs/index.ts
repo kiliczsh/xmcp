@@ -9,38 +9,30 @@ import {
 } from "@/runtime/utils/server";
 import { McpServer } from "@modelcontextprotocol/sdk/server/mcp";
 
-// extract the types from withMcpAuth arguments for auth config
-type XmcpHandlerAuth = {
-  verifyToken?: Parameters<typeof withMcpAuth>[1];
-  options?: Parameters<typeof withMcpAuth>[2];
-};
-
-export async function xmcpHandler(
-  request: Request,
-  auth?: XmcpHandlerAuth
-): Promise<Response> {
+export async function xmcpHandler(request: Request): Promise<Response> {
   const [toolPromises, toolModules] = loadTools();
 
   await Promise.all(toolPromises);
 
-  const authConfigVerifyToken = auth?.verifyToken ?? undefined;
-  const authConfigOptions = auth?.options ?? undefined;
-
-  let requestHandler: (request: Request) => Promise<Response>;
-
-  if (authConfigVerifyToken) {
-    requestHandler = withMcpAuth(
-      createVercelMcpHandler((server: McpServer) => {
-        configureServer(server, toolModules);
-      }, INJECTED_CONFIG),
-      authConfigVerifyToken,
-      authConfigOptions
-    );
-  } else {
-    requestHandler = createVercelMcpHandler((server: McpServer) => {
-      configureServer(server, toolModules);
-    }, INJECTED_CONFIG);
-  }
+  const requestHandler = createVercelMcpHandler((server: McpServer) => {
+    configureServer(server, toolModules);
+  }, INJECTED_CONFIG);
 
   return requestHandler(request);
+}
+
+// extract the types from withMcpAuth arguments for auth config
+export type VerifyToken = Parameters<typeof withMcpAuth>[1];
+export type Options = Parameters<typeof withMcpAuth>[2];
+
+export type AuthConfig = {
+  verifyToken: VerifyToken;
+  options?: Options;
+};
+
+export function withAuth(
+  handler: (request: Request) => Promise<Response>,
+  config: AuthConfig
+): (request: Request) => Promise<Response> {
+  return withMcpAuth(handler, config.verifyToken, config.options);
 }
