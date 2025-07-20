@@ -279,7 +279,6 @@ export class StatelessStreamableHTTPTransport {
     middlewares?: RequestHandler[]
   ) {
     this.options = {
-      bindToLocalhost: true,
       ...options,
     };
     this.app = express();
@@ -290,9 +289,6 @@ export class StatelessStreamableHTTPTransport {
     this.createServerFn = createServerFn;
     this.corsConfig = corsConfig;
     this.middlewares = middlewares;
-
-    console.log("corsConfig", this.corsConfig);
-    console.log("options", options);
 
     // setup oauth proxy if configuration is provided
     if (oauthConfig) {
@@ -402,9 +398,7 @@ export class StatelessStreamableHTTPTransport {
   }
 
   public start(): void {
-    const host =
-      this.options.host ||
-      (this.options.bindToLocalhost ? "127.0.0.1" : "0.0.0.0");
+    const host = this.options.host || "127.0.0.1";
 
     this.server.listen(this.port, host, () => {
       console.log(
