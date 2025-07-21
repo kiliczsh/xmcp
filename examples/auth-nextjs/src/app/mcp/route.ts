@@ -27,14 +27,12 @@ const verifyToken: VerifyToken = async (req: Request, bearerToken?: string) => {
 };
 
 const options = {
+  verifyToken,
   required: true,
   requiredScopes: ["read:messages"],
   resourceMetadataPath: "/.well-known/oauth-protected-resource",
 };
 
-const handler = withAuth(xmcpHandler, {
-  verifyToken,
-  options,
-});
+const handler = withAuth(xmcpHandler, options);
 
 export { handler as GET, handler as POST };
