@@ -1,8 +1,4 @@
-import {
-  adapterOutputPath,
-  distOutputPath,
-  runtimeFolderPath,
-} from "@/utils/constants";
+import { adapterOutputPath, runtimeFolderPath } from "@/utils/constants";
 import fs from "fs-extra";
 import path from "path";
 import { Compiler } from "webpack";
