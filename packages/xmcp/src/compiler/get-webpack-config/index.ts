@@ -7,7 +7,7 @@ import {
 import path from "path";
 import { distOutputPath, adapterOutputPath } from "@/utils/constants";
 import { compilerContext } from "@/compiler/compiler-context";
-import { XmcpParsedConfig } from "@/compiler/parse-xmcp-config";
+import { XmcpConfigOuputSchema } from "@/compiler/config";
 import { getEntries } from "./get-entries";
 import { getInjectedVariables } from "./get-injected-variables";
 import { resolveTsconfigPathsToAlias } from "./resolve-tsconfig-paths";
@@ -16,7 +16,9 @@ import { CreateTypeDefinitionPlugin, InjectRuntimePlugin } from "./plugins";
 import { getExternals } from "./get-externals";
 
 /** Creates the webpack configuration that xmcp will use to bundle the user's code */
-export function getWebpackConfig(xmcpConfig: XmcpParsedConfig): Configuration {
+export function getWebpackConfig(
+  xmcpConfig: XmcpConfigOuputSchema
+): Configuration {
   const processFolder = process.cwd();
   const { mode } = compilerContext.getContext();
 

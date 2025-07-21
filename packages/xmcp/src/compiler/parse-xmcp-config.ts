@@ -1,97 +1,16 @@
 import fs from "fs";
 import path from "path";
-import { z } from "zod";
 import { webpack, type Configuration } from "webpack";
 import { createFsFromVolume, Volume } from "memfs";
 import { compilerContext } from "./compiler-context";
+import {
+  configSchema,
+  XmcpConfigInputSchema,
+  type XmcpConfigOuputSchema,
+} from "./config";
+import { DEFAULT_PATHS_CONFIG } from "./config/constants";
 
-export const DEFAULT_HTTP_PORT = 3002;
-export const DEFAULT_HTTP_BODY_SIZE_LIMIT = 1024 * 1024 * 10; // 10MB
-export const DEFAULT_HTTP_ENDPOINT = "/mcp";
-export const DEFAULT_HTTP_STATELESS = true;
-
-export const DEFAULT_TOOLS_DIR = "src/tools";
-
-// cors config schema
-const corsConfigSchema = z.object({
-  origin: z.union([z.string(), z.array(z.string()), z.boolean()]).optional(),
-  methods: z.union([z.string(), z.array(z.string())]).optional(),
-  allowedHeaders: z.union([z.string(), z.array(z.string())]).optional(),
-  exposedHeaders: z.union([z.string(), z.array(z.string())]).optional(),
-  credentials: z.boolean().optional(),
-  maxAge: z.number().optional(),
-});
-
-// oauth endpoints schema
-const oauthEndpointsSchema = z.object({
-  authorizationUrl: z.string(),
-  tokenUrl: z.string(),
-  revocationUrl: z.string().optional(),
-  userInfoUrl: z.string().optional(),
-  registerUrl: z.string(),
-});
-
-// oauth config schema
-const oauthConfigSchema = z.object({
-  endpoints: oauthEndpointsSchema,
-  issuerUrl: z.string(),
-  baseUrl: z.string(),
-  serviceDocumentationUrl: z.string().optional(),
-  pathPrefix: z.string().default("/oauth2"),
-  defaultScopes: z.array(z.string()).default(["openid", "profile", "email"]),
-});
-
-// adapter config schema
-const adapterConfigSchema = z.enum(["express", "nextjs"]);
-
-// experimental features schema
-const experimentalConfigSchema = z.object({
-  oauth: oauthConfigSchema.optional(),
-  adapter: adapterConfigSchema.optional(),
-});
-
-// paths config
-const pathsConfigSchema = z.object({
-  tools: z.string().default(DEFAULT_TOOLS_DIR),
-  // to do add resources prompts etc
-});
-
-// TODO extract all this config and schemas to a separate file
-const configSchema = z.object({
-  stdio: z.boolean().optional(),
-  http: z
-    .union([
-      z.boolean(),
-      z.object({
-        port: z.number().default(DEFAULT_HTTP_PORT),
-        bodySizeLimit: z.number().default(DEFAULT_HTTP_BODY_SIZE_LIMIT),
-        debug: z.boolean().default(false),
-        endpoint: z.string().default(DEFAULT_HTTP_ENDPOINT),
-        cors: corsConfigSchema.optional(),
-      }),
-    ])
-    .optional(),
-  experimental: experimentalConfigSchema.optional(),
-  paths: pathsConfigSchema.optional().default({
-    tools: DEFAULT_TOOLS_DIR,
-  }),
-  webpack: z.function().args(z.any()).returns(z.any()).optional(),
-});
-
-type InputSchema = z.input<typeof configSchema>;
-type OutputSchema = z.output<typeof configSchema>;
-
-/** Config type for the user to provide */
-export type XmcpInputConfig = Omit<InputSchema, "webpack"> & {
-  webpack?: (config: Configuration) => Configuration;
-};
-
-/** Config with defaults applied */
-export type XmcpParsedConfig = Omit<OutputSchema, "webpack"> & {
-  webpack?: (config: Configuration) => Configuration;
-};
-
-function validateConfig(config: unknown): XmcpParsedConfig {
+function validateConfig(config: unknown): XmcpConfigOuputSchema {
   return configSchema.parse(config);
 }
 
@@ -112,7 +31,7 @@ const configPaths = {
 /**
  * Parse and validate xmcp config file
  */
-export async function getConfig(): Promise<XmcpParsedConfig> {
+export async function getConfig(): Promise<XmcpConfigOuputSchema> {
   const config = await readConfig();
   const { platforms } = compilerContext.getContext();
   if (platforms.vercel) {
@@ -125,7 +44,7 @@ export async function getConfig(): Promise<XmcpParsedConfig> {
 /**
  * Read config from file or return default
  */
-export async function readConfig(): Promise<XmcpParsedConfig> {
+export async function readConfig(): Promise<XmcpConfigOuputSchema> {
   // Simple json config
   const jsonFile = readConfigFile(configPaths.json);
   if (jsonFile) {
@@ -146,17 +65,15 @@ export async function readConfig(): Promise<XmcpParsedConfig> {
   return {
     stdio: true,
     http: true,
-    paths: {
-      tools: DEFAULT_TOOLS_DIR,
-    },
-  } satisfies XmcpInputConfig;
+    paths: DEFAULT_PATHS_CONFIG,
+  } satisfies XmcpConfigInputSchema;
 }
 
 /**
  * If the user is using a typescript config file,
  * we need to bundle it, run it and return its copiled code
  * */
-async function compileConfig(): Promise<XmcpParsedConfig> {
+async function compileConfig(): Promise<XmcpConfigOuputSchema> {
   const configPath = path.resolve(process.cwd(), configPaths.ts);
 
   // Create memory filesystem

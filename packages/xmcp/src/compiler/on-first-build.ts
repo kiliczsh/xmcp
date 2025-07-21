@@ -1,10 +1,13 @@
 import { spawn } from "child_process";
 import { CompilerMode } from ".";
-import { XmcpInputConfig } from "./parse-xmcp-config";
 import { watchdog } from "../utils/spawn-process";
 import { greenCheck } from "../utils/cli-icons";
+import { XmcpConfigOuputSchema } from "./config";
 
-export function onFirstBuild(mode: CompilerMode, xmcpConfig: XmcpInputConfig) {
+export function onFirstBuild(
+  mode: CompilerMode,
+  xmcpConfig: XmcpConfigOuputSchema
+) {
   if (mode === "development" && false) {
     // disable inspector for now
     console.log("🔍 Starting inspector...");

@@ -21,15 +21,7 @@ import { createOAuthProxy, type OAuthProxyConfig } from "../../../auth/oauth";
 import { OAuthProxy } from "../../../auth/oauth/factory";
 import { greenCheck } from "../../../utils/cli-icons";
 import { setResponseCorsHeaders } from "./setup-cors";
-
-export type CorsOptions = {
-  origin?: string | string[] | boolean;
-  methods?: string | string[];
-  allowedHeaders?: string | string[];
-  exposedHeaders?: string | string[];
-  credentials?: boolean;
-  maxAge?: number;
-};
+import { CorsConfig } from "@/compiler/config/schemas";
 
 // no session management, POST only
 export class StatelessHttpServerTransport extends BaseHttpServerTransport {
@@ -275,19 +267,18 @@ export class StatelessStreamableHTTPTransport {
   private debug: boolean;
   private options: HttpTransportOptions;
   private createServerFn: () => Promise<McpServer>;
-  private corsOptions: CorsOptions;
+  private corsConfig: CorsConfig;
   private oauthProxy: OAuthProxy | undefined;
   private middlewares: RequestHandler[] | undefined;
 
   constructor(
     createServerFn: () => Promise<McpServer>,
     options: HttpTransportOptions = {},
-    corsOptions: CorsOptions = {},
+    corsConfig: CorsConfig = {},
     oauthConfig?: OAuthProxyConfig | null,
     middlewares?: RequestHandler[]
   ) {
     this.options = {
-      bindToLocalhost: true,
       ...options,
     };
     this.app = express();
@@ -296,7 +287,7 @@ export class StatelessStreamableHTTPTransport {
     this.endpoint = options.endpoint ?? "/mcp";
     this.debug = options.debug ?? false;
     this.createServerFn = createServerFn;
-    this.corsOptions = corsOptions;
+    this.corsConfig = corsConfig;
     this.middlewares = middlewares;
 
     // setup oauth proxy if configuration is provided
@@ -317,7 +308,7 @@ export class StatelessStreamableHTTPTransport {
 
   private setupMiddleware(bodySizeLimit: string): void {
     this.app.use((req: Request, res: Response, next: NextFunction) => {
-      const cors = this.corsOptions;
+      const cors = this.corsConfig;
       // set cors headers dynamically
       setResponseCorsHeaders(cors, res);
       next();
@@ -407,7 +398,7 @@ export class StatelessStreamableHTTPTransport {
   }
 
   public start(): void {
-    const host = this.options.bindToLocalhost ? "127.0.0.1" : "0.0.0.0";
+    const host = this.options.host || "127.0.0.1";
 
     this.server.listen(this.port, host, () => {
       console.log(

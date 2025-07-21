@@ -1,8 +1,4 @@
-import {
-  adapterOutputPath,
-  distOutputPath,
-  runtimeFolderPath,
-} from "@/utils/constants";
+import { adapterOutputPath, runtimeFolderPath } from "@/utils/constants";
 import fs from "fs-extra";
 import path from "path";
 import { Compiler } from "webpack";
@@ -40,6 +36,8 @@ export class CreateTypeDefinitionPlugin {
         const xmcpConfig = getXmcpConfig();
 
         // Manually type the .xmcp/adapter/index.js file using a .xmcp/adapter/index.d.ts file
+
+        // TO DO add withAuth to the type definition & AuthConfig
         if (xmcpConfig.experimental?.adapter) {
           let typeDefinitionContent = "";
           if (xmcpConfig.experimental?.adapter == "nextjs") {
