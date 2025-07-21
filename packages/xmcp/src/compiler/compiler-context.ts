@@ -1,6 +1,6 @@
 import { CompilerMode } from ".";
 import { createContext } from "../utils/context";
-import { XmcpParsedConfig } from "./parse-xmcp-config";
+import { XmcpConfigOuputSchema } from "./config";
 
 interface CompilerContext {
   /** The mode of the compiler. */
@@ -17,7 +17,7 @@ interface CompilerContext {
   /** Whether the middleware is enabled. */
   hasMiddleware: boolean;
   /** The parsed config. */
-  xmcpConfig?: XmcpParsedConfig;
+  xmcpConfig?: XmcpConfigOuputSchema;
 }
 
 export const compilerContext = createContext<CompilerContext>({
