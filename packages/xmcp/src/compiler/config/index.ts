@@ -6,6 +6,7 @@ import {
   pathsConfigSchema,
   webpackConfigSchema,
 } from "./schemas";
+import { Configuration } from "webpack";
 
 /**
  * xmcp Config schema
@@ -18,7 +19,16 @@ export const configSchema = z.object({
   webpack: webpackConfigSchema.optional(),
 });
 
-export type ConfigSchema = z.infer<typeof configSchema>;
+type WebpackConfig = { webpack?: (config: Configuration) => Configuration };
 
-export type InputSchema = z.input<typeof configSchema>;
-export type OutputSchema = z.output<typeof configSchema>;
+export type XmcpConfigInputSchema = Omit<
+  z.input<typeof configSchema>,
+  "webpack"
+> &
+  WebpackConfig;
+
+export type XmcpConfigOuputSchema = Omit<
+  z.output<typeof configSchema>,
+  "webpack"
+> &
+  WebpackConfig;

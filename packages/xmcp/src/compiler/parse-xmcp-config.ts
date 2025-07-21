@@ -3,20 +3,14 @@ import path from "path";
 import { webpack, type Configuration } from "webpack";
 import { createFsFromVolume, Volume } from "memfs";
 import { compilerContext } from "./compiler-context";
-import { configSchema, type InputSchema, type OutputSchema } from "./config";
+import {
+  configSchema,
+  XmcpConfigInputSchema,
+  type XmcpConfigOuputSchema,
+} from "./config";
 import { DEFAULT_PATHS_CONFIG } from "./config/constants";
 
-/** Config type for the user to provide */
-export type XmcpInputConfig = Omit<InputSchema, "webpack"> & {
-  webpack?: (config: Configuration) => Configuration;
-};
-
-/** Config with defaults applied */
-export type XmcpParsedConfig = Omit<OutputSchema, "webpack"> & {
-  webpack?: (config: Configuration) => Configuration;
-};
-
-function validateConfig(config: unknown): XmcpParsedConfig {
+function validateConfig(config: unknown): XmcpConfigOuputSchema {
   return configSchema.parse(config);
 }
 
@@ -37,7 +31,7 @@ const configPaths = {
 /**
  * Parse and validate xmcp config file
  */
-export async function getConfig(): Promise<XmcpParsedConfig> {
+export async function getConfig(): Promise<XmcpConfigOuputSchema> {
   const config = await readConfig();
   const { platforms } = compilerContext.getContext();
   if (platforms.vercel) {
@@ -50,7 +44,7 @@ export async function getConfig(): Promise<XmcpParsedConfig> {
 /**
  * Read config from file or return default
  */
-export async function readConfig(): Promise<XmcpParsedConfig> {
+export async function readConfig(): Promise<XmcpConfigOuputSchema> {
   // Simple json config
   const jsonFile = readConfigFile(configPaths.json);
   if (jsonFile) {
@@ -72,14 +66,14 @@ export async function readConfig(): Promise<XmcpParsedConfig> {
     stdio: true,
     http: true,
     paths: DEFAULT_PATHS_CONFIG,
-  } satisfies XmcpInputConfig;
+  } satisfies XmcpConfigInputSchema;
 }
 
 /**
  * If the user is using a typescript config file,
  * we need to bundle it, run it and return its copiled code
  * */
-async function compileConfig(): Promise<XmcpParsedConfig> {
+async function compileConfig(): Promise<XmcpConfigOuputSchema> {
   const configPath = path.resolve(process.cwd(), configPaths.ts);
 
   // Create memory filesystem
