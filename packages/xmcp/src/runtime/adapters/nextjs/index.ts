@@ -25,14 +25,15 @@ export async function xmcpHandler(request: Request): Promise<Response> {
 export type VerifyToken = Parameters<typeof withMcpAuth>[1];
 export type Options = Parameters<typeof withMcpAuth>[2];
 
-export type AuthConfig = {
+export type AuthConfig = Options & {
   verifyToken: VerifyToken;
-  options?: Options;
 };
 
 export function withAuth(
   handler: (request: Request) => Promise<Response>,
   config: AuthConfig
 ): (request: Request) => Promise<Response> {
-  return withMcpAuth(handler, config.verifyToken, config.options);
+  const { verifyToken, ...options } = config;
+
+  return withMcpAuth(handler, verifyToken, options);
 }
