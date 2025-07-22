@@ -304,6 +304,9 @@ importers:
 
   examples/middlewares-custom:
     dependencies:
+      jsonwebtoken:
+        specifier: ^9.0.2
+        version: 9.0.2
       xmcp:
         specifier: workspace:*
         version: link:../../packages/xmcp
