@@ -28,7 +28,11 @@ export function getResolvedCorsConfig(
 }
 
 export function getResolvedPathsConfig(userConfig: any): PathsConfig {
-  return { ...DEFAULT_PATHS_CONFIG, ...userConfig?.paths };
+  const userPaths = userConfig?.paths;
+  if (!userPaths) {
+    return DEFAULT_PATHS_CONFIG;
+  }
+  return { ...DEFAULT_PATHS_CONFIG, ...userPaths };
 }
 
 export function getResolvedOAuthConfig(userConfig: any): OAuthConfig | null {

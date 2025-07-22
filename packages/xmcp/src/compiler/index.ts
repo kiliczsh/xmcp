@@ -17,6 +17,7 @@ import { greenCheck } from "@/utils/cli-icons";
 import { compilerContext } from "./compiler-context";
 import { startHttpServer } from "./start-http-server";
 import { isValidPath } from "@/utils/path-validation";
+import { getResolvedPathsConfig } from "./config/utils";
 dotenv.config();
 
 export type CompilerMode = "development" | "production";
@@ -47,7 +48,10 @@ export async function compile({ onBuild }: CompileOptions = {}) {
     ignoreInitial: false,
   });
 
-  let toolsPath = isValidPath(xmpcConfig.paths?.tools, "tools");
+  let toolsPath = isValidPath(
+    getResolvedPathsConfig(xmpcConfig).tools,
+    "tools"
+  );
 
   // handle tools
   watcher.watch(`${toolsPath}/**/*.ts`, {
