@@ -32,6 +32,13 @@ export const DEFAULT_HTTP_CONFIG = {
 };
 
 /**
+ * Default values for the STDIO transport
+ */
+export const DEFAULT_STDIO_CONFIG = {
+  debug: false,
+};
+
+/**
  * Default values for the tools directory
  */
 export const DEFAULT_PATHS_CONFIG = {

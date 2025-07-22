@@ -70,7 +70,9 @@ export function injectStdioVariables(stdioConfig: any) {
   const debug = typeof stdioConfig === "object" ? stdioConfig.debug : false;
 
   return {
-    STDIO_DEBUG: debug,
+    STDIO_CONFIG: JSON.stringify({
+      debug,
+    }),
   };
 }
 

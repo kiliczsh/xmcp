@@ -48,9 +48,10 @@ class StdioTransport {
   }
 }
 
+// @ts-expect-error: injected by compiler
+const debug = STDIO_CONFIG.debug || false;
+
 createServer().then((mcpServer) => {
-  // @ts-expect-error: injected by compiler
-  const debug = STDIO_DEBUG || false;
   const stdioTransport = new StdioTransport(mcpServer, debug);
   stdioTransport.start();
 });
