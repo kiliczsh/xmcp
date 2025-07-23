@@ -29,7 +29,7 @@ export type ToolSchema = Record<
   z.ZodType<unknown, z.ZodTypeDef, unknown>
 >;
 
-export type ExtraArguments = Parameters<ToolCallback<undefined>>[0];
+export type ToolExtraArguments = Parameters<ToolCallback<undefined>>[0];
 
 export type InferSchema<T extends ToolSchema> = {
   [K in keyof T]: z.infer<T[K]>;

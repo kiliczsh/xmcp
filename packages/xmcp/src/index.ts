@@ -5,7 +5,7 @@ dotenv.config();
 export type {
   ToolMetadata,
   ToolSchema,
-  ExtraArguments,
+  ToolExtraArguments,
   InferSchema,
 } from "./types/tool";
 

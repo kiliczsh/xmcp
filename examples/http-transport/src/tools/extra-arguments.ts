@@ -1,4 +1,4 @@
-import { type ToolMetadata, type ExtraArguments } from "xmcp";
+import { type ToolMetadata, type ToolExtraArguments } from "xmcp";
 
 // Define tool metadata
 export const metadata: ToolMetadata = {
@@ -13,7 +13,7 @@ export const metadata: ToolMetadata = {
 };
 
 // Tool implementation
-export default async function extraArguments(_, extra: ExtraArguments) {
+export default async function extraArguments(_, extra: ToolExtraArguments) {
   const extraArguments = JSON.stringify(extra); // to render a readable string
   const result = `Your extra arguments are: ${extraArguments}`;
 
