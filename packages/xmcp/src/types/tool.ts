@@ -1,4 +1,3 @@
-// packages/xmcp/src/types/tool.ts
 import { z } from "zod";
 
 export interface ToolAnnotations {
@@ -22,13 +21,6 @@ export interface ToolMetadata {
   description: string;
   /** Optional hints about tool behavior */
   annotations?: ToolAnnotations;
-}
-
-export interface Tool {
-  type: string;
-  handler: (args: any) => any;
-  metadata: ToolMetadata;
-  schema: Record<string, z.ZodType>;
 }
 
 export type ToolSchema = Record<
