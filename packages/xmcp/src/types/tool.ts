@@ -1,3 +1,4 @@
+import { ToolCallback } from "@modelcontextprotocol/sdk/server/mcp";
 import { z } from "zod";
 
 export interface ToolAnnotations {
@@ -27,6 +28,8 @@ export type ToolSchema = Record<
   string,
   z.ZodType<unknown, z.ZodTypeDef, unknown>
 >;
+
+export type ExtraArguments = Parameters<ToolCallback<undefined>>[0];
 
 export type InferSchema<T extends ToolSchema> = {
   [K in keyof T]: z.infer<T[K]>;
