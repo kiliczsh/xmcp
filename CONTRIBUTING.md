@@ -12,6 +12,8 @@ Before jumping into a PR be sure to search existing PRs or issues for an open or
 
 Follow the templates to report issues or request features.
 
+If you're adding a new feature, please consider adding an example to the `examples` directory.
+
 ## Questions
 
 For help, use [Discord](https://discord.gg/DzsXJcUmQN). For security issues, email [security@basement.studio](mailto:security@basement.studio).
