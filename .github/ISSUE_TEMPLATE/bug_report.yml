@@ -54,8 +54,8 @@ body:
           - npm: 10.8.2
           - Yarn: 1.22.22
           - pnpm: 9.10.0
-        - xmcp version (if applicable):
-        - Framework: (Next.js/Express/Other)
+        - xmcp version:
+        - Adapter (if applicable): Next.js/Express
     validations:
       required: true
   - type: textarea
