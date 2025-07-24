@@ -145,9 +145,9 @@ jobs:
       - name: Create publish summary
         run: |
           cat >> $GITHUB_STEP_SUMMARY << EOF
-          # 📦 Stable Release Published
+          # Stable Release Published
 
-          **Stable release \`${{ github.event.release.tag_name }}\`** (npm tag: \`${{ steps.npm_tag.outputs.tag }}\`) published from main branch:
+          **Stable release \`${{ github.event.release.tag_name }}\`**
 
           - **xmcp@${{ steps.version.outputs.version }}** - [View on NPM](https://www.npmjs.com/package/xmcp)
           - **create-xmcp-app@${{ steps.version.outputs.version }}** - [View on NPM](https://www.npmjs.com/package/create-xmcp-app)
@@ -155,7 +155,7 @@ jobs:
 
           **Install stable version:**
           \`\`\`bash
-          ${{ github.event.release.prerelease && 'npm install xmcp@' || 'npm install xmcp' }}${{ github.event.release.prerelease && steps.npm_tag.outputs.tag || '' }}
+          npm install xmcp@${{ steps.version.outputs.version }}
           \`\`\`
 
           ${{ github.event.release.prerelease && '⚠️ This is a pre-release from main branch.' || '✅ This is a stable production release.' }}
