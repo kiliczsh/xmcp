@@ -149,9 +149,9 @@ jobs:
       - name: Create publish summary
         run: |
           cat >> $GITHUB_STEP_SUMMARY << EOF
-          # 🚀 Canary Release Published
+          # Canary Release Published
 
-          **Canary version \`${{ steps.version.outputs.version }}\`** published from commit \`${{ github.sha }}\`:
+          **Canary version \`${{ steps.version.outputs.version }}\`** published:
 
           - **xmcp@${{ steps.version.outputs.version }}** - [View on NPM](https://www.npmjs.com/package/xmcp)
           - **create-xmcp-app@${{ steps.version.outputs.version }}** - [View on NPM](https://www.npmjs.com/package/create-xmcp-app)
@@ -159,10 +159,8 @@ jobs:
 
           **Install canary version:**
           \`\`\`bash
-          npm install xmcp@canary
-          # or
           npm install xmcp@${{ steps.version.outputs.version }}
           \`\`\`
 
-          ⚠️ This is a canary release. Use with caution in production.
+          This is a canary release. Use with caution in production.
           EOF
