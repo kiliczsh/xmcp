@@ -20,12 +20,6 @@
 - [ ] Documentation
 - [ ] Examples
 
-## Checklist
-
-- [ ] My code follows the project's style guidelines
-- [ ] I have performed a self-review of my code
-- [ ] My changes generate no new warnings or errors
-
 ## Screenshots/Examples
 
 <!-- If applicable, add screenshots or code examples -->
