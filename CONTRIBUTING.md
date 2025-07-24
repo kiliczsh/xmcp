@@ -12,7 +12,7 @@ Before jumping into a PR be sure to search existing PRs or issues for an open or
 
 Follow the templates to report issues or request features.
 
-If you're adding a new feature, please consider adding an example to the `examples` directory.
+If you're adding a new feature, please consider adding an example to the `examples` directory. This will help us test the feature and ensure it works as expected.
 
 ## Questions
 
