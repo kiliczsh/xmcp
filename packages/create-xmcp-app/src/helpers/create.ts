@@ -6,6 +6,7 @@ import { renameFiles } from "./rename.js";
 import { updatePackageJson } from "./update-package.js";
 import { install } from "./install.js";
 import { generateConfig } from "./generate-config.js";
+import { initGit } from "./git.js";
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
@@ -19,6 +20,7 @@ interface ProjectOptions {
   useLocalXmcp?: boolean;
   deployToVercel?: boolean;
   skipInstall?: boolean;
+  initializeGit?: boolean;
 }
 
 /**
@@ -43,6 +45,7 @@ export function createProject(options: ProjectOptions): void {
     useLocalXmcp,
     deployToVercel,
     skipInstall,
+    initializeGit,
   } = options;
 
   // Ensure the project directory exists
@@ -77,5 +80,14 @@ export function createProject(options: ProjectOptions): void {
   // Install project dependencies
   if (!skipInstall) {
     install(projectPath, packageManager, packageVersion);
+  }
+
+  // FINAL STEP: Initialize git repository after all project files are created
+  // This ensures git tracks the complete, final project structure including:
+  // - Generated source files, configs, package.json
+  // - Installed node_modules (if not in .gitignore)
+  // - Any build artifacts or generated files
+  if (initializeGit) {
+    initGit(projectPath);
   }
 }
