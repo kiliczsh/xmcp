@@ -30,38 +30,6 @@ jobs:
           cache: "pnpm"
           registry-url: "https://registry.npmjs.org"
 
-      - name: Install dependencies
-        run: pnpm install --no-frozen-lockfile
-
-      - name: Build packages
-        run: pnpm turbo build --filter=xmcp --filter=create-xmcp-app --filter=init-xmcp
-
-      - name: Verify build outputs
-        run: |
-          # Verify xmcp package build
-          cd packages/xmcp
-          if [ ! -f "dist/index.js" ] || [ ! -f "dist/index.d.ts" ] || [ ! -f "dist/cli.js" ]; then
-            echo "❌ xmcp package build verification failed"
-            exit 1
-          fi
-          echo "✅ xmcp package build verified"
-
-          # Verify create-xmcp-app CLI build
-          cd ../create-xmcp-app
-          if [ ! -f "index.js" ]; then
-            echo "❌ create-xmcp-app CLI build verification failed"
-            exit 1
-          fi
-          echo "✅ create-xmcp-app CLI build verified"
-
-          # Verify init-xmcp CLI build
-          cd ../init-xmcp
-          if [ ! -f "dist/index.js" ]; then
-            echo "❌ init-xmcp CLI build verification failed"
-            exit 1
-          fi
-          echo "✅ init-xmcp CLI build verified"
-
       - name: Generate canary version
         id: version
         run: |
@@ -118,6 +86,38 @@ jobs:
           cd ../init-xmcp
           npm version "$VERSION" --no-git-tag-version
           echo "✅ Updated init-xmcp version to $VERSION"
+
+      - name: Install dependencies
+        run: pnpm install --no-frozen-lockfile
+
+      - name: Build packages
+        run: pnpm turbo build --filter=xmcp --filter=create-xmcp-app --filter=init-xmcp
+
+      - name: Verify build outputs
+        run: |
+          # Verify xmcp package build
+          cd packages/xmcp
+          if [ ! -f "dist/index.js" ] || [ ! -f "dist/index.d.ts" ] || [ ! -f "dist/cli.js" ]; then
+            echo "❌ xmcp package build verification failed"
+            exit 1
+          fi
+          echo "✅ xmcp package build verified"
+
+          # Verify create-xmcp-app CLI build
+          cd ../create-xmcp-app
+          if [ ! -f "index.js" ]; then
+            echo "❌ create-xmcp-app CLI build verification failed"
+            exit 1
+          fi
+          echo "✅ create-xmcp-app CLI build verified"
+
+          # Verify init-xmcp CLI build
+          cd ../init-xmcp
+          if [ ! -f "dist/index.js" ]; then
+            echo "❌ init-xmcp CLI build verification failed"
+            exit 1
+          fi
+          echo "✅ init-xmcp CLI build verified"
 
       - name: Publish xmcp package
         env:

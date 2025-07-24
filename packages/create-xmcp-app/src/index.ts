@@ -185,6 +185,7 @@ const program = new Command()
         projectName,
         packageManager,
         transports: transports,
+        packageVersion: packageJson.version,
         useLocalXmcp,
         deployToVercel,
         skipInstall,

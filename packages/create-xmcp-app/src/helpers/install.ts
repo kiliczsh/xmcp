@@ -5,17 +5,20 @@ import { execSync } from "child_process";
  * @param packageManager - Package manager name (npm, yarn, or pnpm)
  * @returns Install command string with appropriate flags
  */
-function getInstallCommand(packageManager: string): string {
+function getInstallCommand(
+  packageManager: string,
+  packageVersion: string
+): string {
   switch (packageManager) {
     case "yarn":
       // Add --check-engines flag to enforce Node version requirement
-      return "yarn install --check-engines xmcp@latest";
+      return `yarn install --check-engines xmcp@${packageVersion}`;
     case "pnpm":
-      return "pnpm install xmcp@latest";
+      return `pnpm install xmcp@${packageVersion}`;
     case "npm":
     default:
       // npm automatically checks engines by default
-      return "npm install xmcp@latest";
+      return `npm install xmcp@${packageVersion}`;
   }
 }
 
@@ -24,7 +27,11 @@ function getInstallCommand(packageManager: string): string {
  * @param projectPath - Project directory path where dependencies should be installed
  * @param packageManager - Package manager to use (npm, yarn, or pnpm)
  */
-export function install(projectPath: string, packageManager: string): void {
-  const installCommand = getInstallCommand(packageManager);
+export function install(
+  projectPath: string,
+  packageManager: string,
+  packageVersion: string
+): void {
+  const installCommand = getInstallCommand(packageManager, packageVersion);
   execSync(installCommand, { cwd: projectPath, stdio: "inherit" });
 }

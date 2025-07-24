@@ -15,6 +15,7 @@ interface ProjectOptions {
   projectName: string;
   packageManager: string;
   transports: string[];
+  packageVersion: string;
   useLocalXmcp?: boolean;
   deployToVercel?: boolean;
   skipInstall?: boolean;
@@ -38,6 +39,7 @@ export function createProject(options: ProjectOptions): void {
     projectName,
     packageManager,
     transports,
+    packageVersion,
     useLocalXmcp,
     deployToVercel,
     skipInstall,
@@ -74,6 +76,6 @@ export function createProject(options: ProjectOptions): void {
 
   // Install project dependencies
   if (!skipInstall) {
-    install(projectPath, packageManager);
+    install(projectPath, packageManager, packageVersion);
   }
 }
