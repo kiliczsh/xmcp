@@ -1,14 +1,11 @@
-name: Publish Stable Release to NPM
+name: Publish Canary Release to NPM
 
 on:
-  release:
-    types: [published]
+  workflow_dispatch:
 
 jobs:
-  publish:
+  publish-canary:
     runs-on: ubuntu-latest
-    # Only run for releases created from main branch
-    if: github.event.release.target_commitish == 'main'
     permissions:
       contents: read
       id-token: write
@@ -20,8 +17,6 @@ jobs:
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
-        with:
-          ref: ${{ github.event.release.tag_name }}
 
       - name: Setup pnpm
         uses: pnpm/action-setup@v4
@@ -67,34 +62,43 @@ jobs:
           fi
           echo "✅ init-xmcp CLI build verified"
 
-      - name: Extract version from release tag
+      - name: Generate canary version
         id: version
         run: |
-          # Extract version from tag (assumes tags like v1.0.0 or 1.0.0)
-          VERSION=${GITHUB_REF#refs/tags/}
-          VERSION=${VERSION#v} # Remove 'v' prefix if present
-          echo "version=$VERSION" >> $GITHUB_OUTPUT
-          echo "Publishing version: $VERSION"
+          # Get the latest published version from NPM (fallback to package.json if not published)
+          LATEST_NPM_VERSION=$(npm view xmcp version 2>/dev/null || echo "")
 
-      - name: Determine npm tag
-        id: npm_tag
-        run: |
-          # For main branch releases, always use 'latest' for stable releases
-          # or appropriate pre-release tag for pre-releases
-          if [[ "${{ github.event.release.prerelease }}" == "true" ]]; then
-            # Extract pre-release tag from version (e.g., 1.0.0-beta.1 -> beta)
-            VERSION="${{ steps.version.outputs.version }}"
-            if [[ $VERSION =~ -([a-zA-Z]+) ]]; then
-              TAG="${BASH_REMATCH[1]}"
-            else
-              TAG="prerelease"
-            fi
-            echo "tag=$TAG" >> $GITHUB_OUTPUT
-            echo "Pre-release detected, using npm tag: $TAG"
+          if [ -z "$LATEST_NPM_VERSION" ]; then
+            # If package not published yet, use version from package.json
+            BASE_VERSION=$(cat packages/xmcp/package.json | grep '"version"' | cut -d'"' -f4)
+            echo "Package not published yet, using package.json version: $BASE_VERSION"
+            CANARY_NUMBER=1
           else
-            echo "tag=latest" >> $GITHUB_OUTPUT
-            echo "Stable release detected, using npm tag: latest"
+            BASE_VERSION="$LATEST_NPM_VERSION"
+            echo "Using latest stable NPM version as base: $BASE_VERSION"
+            
+            # Get all published versions and find existing canary versions for this base
+            ALL_VERSIONS=$(npm view xmcp versions --json 2>/dev/null || echo "[]")
+            
+            # Find the highest canary number for this base version
+            HIGHEST_CANARY=$(echo "$ALL_VERSIONS" | jq -r ".[]" | grep "^${BASE_VERSION}-canary\." | sed "s/^${BASE_VERSION}-canary\.//" | sort -n | tail -1)
+            
+            if [ -z "$HIGHEST_CANARY" ] || [ "$HIGHEST_CANARY" = "null" ]; then
+              # No existing canary versions for this base, start at 1
+              CANARY_NUMBER=1
+              echo "No existing canary versions found for base $BASE_VERSION, starting at canary.1"
+            else
+              # Increment from the highest existing canary number
+              CANARY_NUMBER=$((HIGHEST_CANARY + 1))
+              echo "Found existing canary versions up to canary.$HIGHEST_CANARY, using canary.$CANARY_NUMBER"
+            fi
           fi
+
+          # Generate canary version with incremental number per stable version
+          CANARY_VERSION="${BASE_VERSION}-canary.${CANARY_NUMBER}"
+
+          echo "version=$CANARY_VERSION" >> $GITHUB_OUTPUT
+          echo "Publishing canary version: $CANARY_VERSION"
 
       - name: Update package versions
         run: |
@@ -120,43 +124,45 @@ jobs:
           NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
         run: |
           cd packages/xmcp
-          echo "Publishing xmcp package with tag: ${{ steps.npm_tag.outputs.tag }}"
-          npm publish --access public --tag ${{ steps.npm_tag.outputs.tag }}
-          echo "✅ Successfully published xmcp@${{ steps.version.outputs.version }} with tag ${{ steps.npm_tag.outputs.tag }}"
+          echo "Publishing xmcp package with canary tag"
+          npm publish --access public --tag canary
+          echo "✅ Successfully published xmcp@${{ steps.version.outputs.version }} with tag canary"
 
       - name: Publish create-xmcp-app package
         env:
           NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
         run: |
           cd packages/create-xmcp-app
-          echo "Publishing create-xmcp-app package with tag: ${{ steps.npm_tag.outputs.tag }}"
-          npm publish --access public --tag ${{ steps.npm_tag.outputs.tag }}
-          echo "✅ Successfully published create-xmcp-app@${{ steps.version.outputs.version }} with tag ${{ steps.npm_tag.outputs.tag }}"
+          echo "Publishing create-xmcp-app package with canary tag"
+          npm publish --access public --tag canary
+          echo "✅ Successfully published create-xmcp-app@${{ steps.version.outputs.version }} with tag canary"
 
       - name: Publish init-xmcp package
         env:
           NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
         run: |
           cd packages/init-xmcp
-          echo "Publishing init-xmcp package with tag: ${{ steps.npm_tag.outputs.tag }}"
-          npm publish --access public --tag ${{ steps.npm_tag.outputs.tag }}
-          echo "✅ Successfully published init-xmcp@${{ steps.version.outputs.version }} with tag ${{ steps.npm_tag.outputs.tag }}"
+          echo "Publishing init-xmcp package with canary tag"
+          npm publish --access public --tag canary
+          echo "✅ Successfully published init-xmcp@${{ steps.version.outputs.version }} with tag canary"
 
       - name: Create publish summary
         run: |
           cat >> $GITHUB_STEP_SUMMARY << EOF
-          # 📦 Stable Release Published
+          # 🚀 Canary Release Published
 
-          **Stable release \`${{ github.event.release.tag_name }}\`** (npm tag: \`${{ steps.npm_tag.outputs.tag }}\`) published from main branch:
+          **Canary version \`${{ steps.version.outputs.version }}\`** published from commit \`${{ github.sha }}\`:
 
           - **xmcp@${{ steps.version.outputs.version }}** - [View on NPM](https://www.npmjs.com/package/xmcp)
           - **create-xmcp-app@${{ steps.version.outputs.version }}** - [View on NPM](https://www.npmjs.com/package/create-xmcp-app)
           - **init-xmcp@${{ steps.version.outputs.version }}** - [View on NPM](https://www.npmjs.com/package/init-xmcp)
 
-          **Install stable version:**
+          **Install canary version:**
           \`\`\`bash
-          ${{ github.event.release.prerelease && 'npm install xmcp@' || 'npm install xmcp' }}${{ github.event.release.prerelease && steps.npm_tag.outputs.tag || '' }}
+          npm install xmcp@canary
+          # or
+          npm install xmcp@${{ steps.version.outputs.version }}
           \`\`\`
 
-          ${{ github.event.release.prerelease && '⚠️ This is a pre-release from main branch.' || '✅ This is a stable production release.' }}
+          ⚠️ This is a canary release. Use with caution in production.
           EOF
