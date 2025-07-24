@@ -1,3 +1,5 @@
+> **Important: Please ensure your pull request is targeting the `canary` branch. PRs to other branches may be closed or require retargeting.**
+
 ## Summary
 
 <!-- Brief description of changes -->
