@@ -30,7 +30,7 @@ function createProjectDirectories(projectPath: string): void {
 }
 
 /**
- * Create a new XMCP project by orchestrating all the setup steps
+ * Create a new xmcp project by orchestrating all the setup steps
  * @param options - Configuration options for project creation
  */
 export function createProject(options: ProjectOptions): void {
