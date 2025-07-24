@@ -32,6 +32,5 @@ body:
         - init-xmcp
         - Examples
         - New package
-        - Other
     validations:
       required: true
