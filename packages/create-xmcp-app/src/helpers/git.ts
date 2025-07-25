@@ -5,11 +5,14 @@ import chalk from "chalk";
 import ora from "ora";
 
 /**
- * Check if git is installed on the system
+ * Check if we're inside a Git repository
  */
-function isGitInstalled(): boolean {
+function isInGitRepository(path: string): boolean {
   try {
-    execSync("git --version", { stdio: "pipe" });
+    execSync("git rev-parse --git-dir", {
+      stdio: "pipe",
+      cwd: path,
+    });
     return true;
   } catch {
     return false;
@@ -17,47 +20,18 @@ function isGitInstalled(): boolean {
 }
 
 /**
- * Detect which VCS system (if any) is being used in the directory
- * We check in order of popularity: Git → Mercurial → Jujutsu
- * Using command-based detection first ensures we find active repos, not just abandoned directories
+ * Check if we're inside a Mercurial repository
  */
-function detectExistingVCS(
-  path: string
-): "git" | "mercurial" | "jujutsu" | "none" {
-  try {
-    execSync("git rev-parse --git-dir", {
-      stdio: "pipe",
-      cwd: path,
-    });
-    return "git";
-  } catch {
-  }
-
+function isInMercurialRepository(path: string): boolean {
   try {
     execSync("hg root", {
       stdio: "pipe",
       cwd: path,
     });
-    return "mercurial";
+    return true;
   } catch {
-    if (existsSync(join(path, ".hg"))) {
-      return "mercurial";
-    }
+    return existsSync(join(path, ".hg"));
   }
-
-  try {
-    execSync("jj log -l 1", {
-      stdio: "pipe",
-      cwd: path,
-    });
-    return "jujutsu";
-  } catch {
-    if (existsSync(join(path, ".jj"))) {
-      return "jujutsu";
-    }
-  }
-
-  return "none";
 }
 
 /**
@@ -68,24 +42,19 @@ export function initGit(path: string): boolean {
   const spinner = ora();
 
   try {
-    if (!isGitInstalled()) {
+    if (isInGitRepository(path)) {
       console.log(
-        chalk.yellow("\nGit is not installed. Skipping git initialization.")
+        chalk.blue(
+          "\nAlready inside a Git repository. Skipping git initialization."
+        )
       );
       return false;
     }
 
-    const existingVCS = detectExistingVCS(path);
-    if (existingVCS !== "none") {
-      const vcsName =
-        existingVCS === "git"
-          ? "Git"
-          : existingVCS === "mercurial"
-            ? "Mercurial"
-            : "Jujutsu";
+    if (isInMercurialRepository(path)) {
       console.log(
         chalk.blue(
-          `\nAlready inside a ${vcsName} repository. Skipping git initialization.`
+          "\nAlready inside a Mercurial repository. Skipping git initialization."
         )
       );
       return false;
