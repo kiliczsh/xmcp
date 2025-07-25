@@ -41,8 +41,6 @@ function hasGitUserConfig(): boolean {
 function detectExistingVCS(
   path: string
 ): "git" | "mercurial" | "jujutsu" | "none" {
-  // Git check: use rev-parse which is the standard way to detect git repos
-  // This works even in subdirectories and handles all git repository types
   try {
     execSync("git rev-parse --git-dir", {
       stdio: "pipe",
@@ -50,10 +48,8 @@ function detectExistingVCS(
     });
     return "git";
   } catch {
-    // Not a git repository, continue checking other VCS systems
   }
 
-  // Mercurial check: 'hg root' reliably detects if we're in a Mercurial working copy
   try {
     execSync("hg root", {
       stdio: "pipe",
@@ -61,14 +57,11 @@ function detectExistingVCS(
     });
     return "mercurial";
   } catch {
-    // Command failed (hg not installed or not in repo), try filesystem check
-    // This catches cases where .hg exists but hg command isn't available
     if (existsSync(join(path, ".hg"))) {
       return "mercurial";
     }
   }
 
-  // Jujutsu check: 'jj log -l 1' is lightweight and confirms repo is functional
   try {
     execSync("jj log -l 1", {
       stdio: "pipe",
@@ -76,14 +69,11 @@ function detectExistingVCS(
     });
     return "jujutsu";
   } catch {
-    // Command failed (jj not installed or not in repo), try filesystem check
-    // This catches cases where .jj exists but jj command isn't available
     if (existsSync(join(path, ".jj"))) {
       return "jujutsu";
     }
   }
 
-  // No VCS detected - safe to initialize git
   return "none";
 }
 
@@ -95,8 +85,6 @@ export function initGit(path: string): boolean {
   const spinner = ora();
 
   try {
-    // PREREQUISITE CHECK: Ensure git is available before attempting anything
-    // Fail fast if git isn't installed rather than failing during init
     if (!isGitInstalled()) {
       console.log(
         chalk.yellow("\nGit is not installed. Skipping git initialization.")
@@ -104,8 +92,6 @@ export function initGit(path: string): boolean {
       return false;
     }
 
-    // CONFLICT AVOIDANCE: Don't initialize git inside existing VCS repositories
-    // This prevents nested repos and respects existing version control choices
     const existingVCS = detectExistingVCS(path);
     if (existingVCS !== "none") {
       const vcsName =
@@ -124,21 +110,16 @@ export function initGit(path: string): boolean {
 
     spinner.start("Initializing git repository");
 
-    // STEP 1: Create the git repository structure
     execSync("git init", {
       stdio: "pipe",
       cwd: path,
     });
 
-    // STEP 2: Stage all project files for the initial commit
-    // This ensures the entire generated project is tracked from the start
     execSync("git add -A", {
       stdio: "pipe",
       cwd: path,
     });
 
-    // STEP 3: Conditional commit based on user configuration
-    // Only auto-commit if user has name/email configured to avoid git errors
     if (hasGitUserConfig()) {
       execSync('git commit -m "Initial commit from create-xmcp-app"', {
         stdio: "pipe",
@@ -146,8 +127,6 @@ export function initGit(path: string): boolean {
       });
       spinner.succeed("Git repository initialized with initial commit");
     } else {
-      // Files are staged but not committed - let user configure git first
-      // This prevents the common "Please tell me who you are" git error
       spinner.succeed("Git repository initialized (files staged)");
       console.log(
         chalk.yellow(
@@ -162,7 +141,6 @@ export function initGit(path: string): boolean {
     }
     return true;
   } catch (error) {
-    // If any step fails, show error but don't crash the entire project creation
     spinner.fail("Failed to initialize git repository");
     console.error(chalk.red("\nError details:"), error);
     return false;

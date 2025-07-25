@@ -84,8 +84,6 @@ const program = new Command()
     let deployToVercel = options.vercel;
     let skipInstall = options.skipInstall;
     let transports = ["http"];
-    // Convert --skip-git CLI option to positive initializeGit flag
-    // Default behavior is to initialize git (initializeGit = true when skipGit = false)
     let initializeGit = !options.skipGit;
 
     // Handle transport selection from CLI options

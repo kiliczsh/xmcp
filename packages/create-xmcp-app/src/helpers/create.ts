@@ -82,11 +82,6 @@ export function createProject(options: ProjectOptions): void {
     install(projectPath, packageManager, packageVersion);
   }
 
-  // FINAL STEP: Initialize git repository after all project files are created
-  // This ensures git tracks the complete, final project structure including:
-  // - Generated source files, configs, package.json
-  // - Installed node_modules (if not in .gitignore)
-  // - Any build artifacts or generated files
   if (initializeGit) {
     initGit(projectPath);
   }
