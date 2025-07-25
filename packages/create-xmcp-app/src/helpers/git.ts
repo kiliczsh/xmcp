@@ -17,23 +17,6 @@ function isGitInstalled(): boolean {
 }
 
 /**
- * Check if git user config is set
- */
-function hasGitUserConfig(): boolean {
-  try {
-    const userName = execSync("git config user.name", { stdio: "pipe" })
-      .toString()
-      .trim();
-    const userEmail = execSync("git config user.email", { stdio: "pipe" })
-      .toString()
-      .trim();
-    return Boolean(userName && userEmail);
-  } catch {
-    return false;
-  }
-}
-
-/**
  * Detect which VCS system (if any) is being used in the directory
  * We check in order of popularity: Git → Mercurial → Jujutsu
  * Using command-based detection first ensures we find active repos, not just abandoned directories
@@ -120,25 +103,17 @@ export function initGit(path: string): boolean {
       cwd: path,
     });
 
-    if (hasGitUserConfig()) {
-      execSync('git commit -m "Initial commit from create-xmcp-app"', {
-        stdio: "pipe",
-        cwd: path,
-      });
-      spinner.succeed("Git repository initialized with initial commit");
-    } else {
-      spinner.succeed("Git repository initialized (files staged)");
-      console.log(
-        chalk.yellow(
-          "\nGit user configuration not found. To make your first commit, run:"
-        )
-      );
-      console.log(chalk.cyan('  git config --global user.name "Your Name"'));
-      console.log(
-        chalk.cyan('  git config --global user.email "your.email@example.com"')
-      );
-      console.log(chalk.cyan('  git commit -m "Initial commit"'));
-    }
+    spinner.succeed("Git repository initialized (files staged)");
+    console.log(
+      chalk.yellow(
+        "\nTo make your first commit, ensure git user config is set and run:"
+      )
+    );
+    console.log(chalk.cyan('  git config --global user.name "Your Name"'));
+    console.log(
+      chalk.cyan('  git config --global user.email "your.email@example.com"')
+    );
+    console.log(chalk.cyan('  git commit -m "Initial commit"'));
     return true;
   } catch (error) {
     spinner.fail("Failed to initialize git repository");
