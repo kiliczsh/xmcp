@@ -79,7 +79,6 @@ const program = new Command()
     }
 
     let packageManager = "npm";
-    let useLocalXmcp = options.local;
     let deployToVercel = options.vercel;
     let skipInstall = options.skipInstall;
     let transports = ["http"];
@@ -186,7 +185,6 @@ const program = new Command()
         packageManager,
         transports: transports,
         packageVersion: packageJson.version,
-        useLocalXmcp,
         deployToVercel,
         skipInstall,
       });
