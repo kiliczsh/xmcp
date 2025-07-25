@@ -17,7 +17,6 @@ interface ProjectOptions {
   packageManager: string;
   transports: string[];
   packageVersion: string;
-  useLocalXmcp?: boolean;
   deployToVercel?: boolean;
   skipInstall?: boolean;
   initializeGit?: boolean;
@@ -42,7 +41,6 @@ export function createProject(options: ProjectOptions): void {
     packageManager,
     transports,
     packageVersion,
-    useLocalXmcp,
     deployToVercel,
     skipInstall,
     initializeGit,
@@ -64,7 +62,7 @@ export function createProject(options: ProjectOptions): void {
   generateConfig(projectPath, transports);
 
   // Update package.json with project configuration
-  updatePackageJson(projectPath, projectName, transports, useLocalXmcp);
+  updatePackageJson(projectPath, projectName, transports);
 
   // Add vercel.json if deployToVercel is true
   if (deployToVercel) {
