@@ -28,7 +28,7 @@ export async function findAvailablePort(
   startPort: number = 3002,
   host: string = "127.0.0.1"
 ): Promise<number> {
-  return new Promise((resolve, reject) => {
+  return new Promise((resolve) => {
     checkPortAvailability(startPort, host).then((isAvailable) => {
       if (isAvailable) {
         resolve(startPort);
