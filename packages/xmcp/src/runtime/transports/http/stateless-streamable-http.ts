@@ -284,7 +284,7 @@ export class StatelessStreamableHTTPTransport {
     };
     this.app = express();
     this.server = http.createServer(this.app);
-    this.port = options.port ?? parseInt(process.env.PORT || "3002", 10);
+    this.port = options.port ?? parseInt(process.env.PORT || "3001", 10);
     this.endpoint = options.endpoint ?? "/mcp";
     this.debug = options.debug ?? false;
     this.createServerFn = createServerFn;
@@ -412,14 +412,10 @@ export class StatelessStreamableHTTPTransport {
         console.log(
           `   Discovery: http://${host}:${port}/.well-known/oauth-authorization-server`
         );
-        console.log(
-          `   Authorize: http://${host}:${port}/oauth2/authorize`
-        );
+        console.log(`   Authorize: http://${host}:${port}/oauth2/authorize`);
         console.log(`   Token: http://${host}:${port}/oauth2/token`);
         console.log(`   Revoke: http://${host}:${port}/oauth2/revoke`);
-        console.log(
-          `   Introspect: http://${host}:${port}/oauth2/introspect`
-        );
+        console.log(`   Introspect: http://${host}:${port}/oauth2/introspect`);
       }
 
       this.setupShutdownHandlers();

@@ -25,7 +25,7 @@ const checkPortAvailability = (port: number, host: string) => {
 };
 
 export async function findAvailablePort(
-  startPort: number = 3002,
+  startPort: number = 3001,
   host: string = "127.0.0.1"
 ): Promise<number> {
   return new Promise((resolve) => {
